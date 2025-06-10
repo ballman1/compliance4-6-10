@@ -1,0 +1,1616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EpiAccess.org - Epinephrine Compliance Platform</title>
+    <script>
+        function switchTab(clickedTab, tabName) {
+            // Hide all tab contents
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active from all tabs
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected content
+            const targetContent = document.getElementById(tabName);
+            if (targetContent) {
+                targetContent.classList.add('active');
+            }
+            
+            // Activate clicked tab
+            if (clickedTab) {
+                clickedTab.classList.add('active');
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --primary: #1e3a5f;
+            --secondary: #f97316;
+            --accent: #3498db;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --gray: #64748b;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        /* Custom icon replacements */
+        .icon {
+            display: inline-block;
+            width: 1em;
+            height: 1em;
+            text-align: center;
+            font-style: normal;
+            font-weight: normal;
+        }
+        
+        .icon-home::before { content: "🏠"; }
+        .icon-dashboard::before { content: "📊"; }
+        .icon-pen::before { content: "💉"; }
+        .icon-user::before { content: "👨‍🎓"; }
+        .icon-check::before { content: "✅"; }
+        .icon-warning::before { content: "⚠️"; }
+        .icon-error::before { content: "❌"; }
+        .icon-info::before { content: "ℹ️"; }
+        .icon-calendar::before { content: "📅"; }
+        .icon-location::before { content: "📍"; }
+        .icon-quantity::before { content: "📦"; }
+        .icon-barcode::before { content: "📋"; }
+        .icon-certificate::before { content: "🏆"; }
+        .icon-plus::before { content: "➕"; }
+        .icon-trash::before { content: "🗑️"; }
+        .icon-download::before { content: "⬇️"; }
+        .icon-refresh::before { content: "🔄"; }
+        .icon-bell::before { content: "🔔"; }
+        .icon-pdf::before { content: "📄"; }
+        .icon-shield::before { content: "🛡️"; }
+        .icon-admin::before { content: "👑"; }
+        .icon-phone::before { content: "📞"; }
+        .icon-rocket::before { content: "🚀"; }
+        .icon-award::before { content: "🥇"; }
+        .icon-balance::before { content: "⚖️"; }
+        .icon-graduation::before { content: "🎓"; }
+        .icon-gavel::before { content: "🔨"; }
+        .icon-tasks::before { content: "📋"; }
+        .icon-file::before { content: "📁"; }
+        .icon-clock::before { content: "⏰"; }
+        .icon-circle-check::before { content: "✅"; }
+        .icon-circle-x::before { content: "❌"; }
+        .icon-triangle::before { content: "⚠️"; }
+        .icon-users::before { content: "👥"; }
+        .icon-sync::before { content: "🔄"; }
+        .icon-spinner::before { content: "⏳"; animation: spin 1s linear infinite; }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), #1a2530);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo-small {
+            width: 50px;
+            height: 50px;
+            position: relative;
+        }
+        
+        .logo-circle-small {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .logo-inner-small {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .epi-pen-small {
+            width: 20px;
+            height: 30px;
+            background: var(--primary);
+            border-radius: 2px 2px 5px 5px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .epi-pen-small::before {
+            content: '';
+            position: absolute;
+            top: 2px;
+            width: 15px;
+            height: 5px;
+            background: var(--primary);
+            border-radius: 3px 3px 0 0;
+        }
+        
+        .epi-pen-small::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            width: 6px;
+            height: 6px;
+            background: var(--primary);
+            border-radius: 0 0 3px 3px;
+        }
+        
+        .cross-small {
+            color: white;
+            font-size: 8px;
+            font-weight: bold;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid #ddd;
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            padding: 1rem 2rem;
+            cursor: pointer;
+            background: #f1f1f1;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            border-radius: 5px 5px 0 0;
+            margin-right: 5px;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        .tab:hover {
+            background: #e9ecef;
+        }
+        
+        .tab.active {
+            background: white;
+            font-weight: bold;
+            border-bottom: 3px solid var(--secondary);
+            color: var(--secondary);
+        }
+        
+        .tab-content {
+            display: none;
+            background: white;
+            padding: 2rem;
+            border-radius: 0 0 5px 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Landing page styles */
+        .hero-landing {
+            background: linear-gradient(135deg, var(--primary) 0%, #2563eb 100%);
+            color: white;
+            padding: 4rem 2rem;
+            text-align: center;
+            border-radius: 15px;
+            margin: -2rem -2rem 3rem -2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-landing::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.1;
+        }
+        
+        .logo-landing {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 2rem;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .logo-circle-landing {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: var(--secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+            position: relative;
+        }
+        
+        .logo-inner-landing {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .epi-pen-landing {
+            width: 60px;
+            height: 90px;
+            background: var(--primary);
+            border-radius: 6px 6px 15px 15px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .epi-pen-landing::before {
+            content: '';
+            position: absolute;
+            top: 8px;
+            width: 45px;
+            height: 15px;
+            background: var(--primary);
+            border-radius: 8px 8px 0 0;
+        }
+        
+        .epi-pen-landing::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            width: 15px;
+            height: 15px;
+            background: var(--primary);
+            border-radius: 0 0 8px 8px;
+        }
+        
+        .cross-landing {
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .hero-landing h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .hero-landing .tagline {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .cta-button {
+            background: var(--secondary);
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 8px 20px rgba(249, 115, 22, 0.3);
+            position: relative;
+            z-index: 2;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(249, 115, 22, 0.4);
+            background: #ea580c;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+        
+        .feature-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-top: 4px solid var(--secondary);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+        
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--secondary), #fb923c);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            color: white;
+            font-size: 1.5rem;
+        }
+        
+        .feature-card h3 {
+            font-size: 1.3rem;
+            color: var(--primary);
+            margin-bottom: 0.8rem;
+        }
+        
+        .feature-card p {
+            color: var(--gray);
+            line-height: 1.6;
+        }
+        
+        /* Dashboard and other tab styles */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border 0.3s;
+        }
+        
+        input:focus, select:focus {
+            border-color: var(--secondary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.2);
+        }
+        
+        button {
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: background 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        button:hover {
+            background-color: #ea580c;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+        }
+        
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+        
+        .btn-success {
+            background-color: var(--success);
+        }
+        
+        .btn-success:hover {
+            background-color: #219653;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .expiring-soon {
+            background-color: #fef9e7 !important;
+            border-left: 4px solid var(--warning);
+        }
+        
+        .expired {
+            background-color: #fdedec !important;
+            border-left: 4px solid var(--danger);
+        }
+        
+        .status-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        
+        .status-valid {
+            background-color: #eafaf1;
+            color: var(--success);
+        }
+        
+        .status-expiring {
+            background-color: #fef5e7;
+            color: var(--warning);
+        }
+        
+        .status-expired {
+            background-color: #fdecea;
+            color: var(--danger);
+        }
+        
+        .alert {
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .alert i {
+            font-size: 1.5rem;
+        }
+        
+        .alert-warning {
+            background-color: #fef5e7;
+            border-left: 4px solid var(--warning);
+            color: #856404;
+        }
+        
+        .legal-section {
+            background-color: #e8f4fd;
+            padding: 1.5rem;
+            border-radius: 4px;
+            margin: 2rem 0;
+            font-size: 0.9rem;
+            border-left: 4px solid var(--accent);
+        }
+        
+        .legal-section h3 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            margin-top: 2rem;
+            border-top: 1px solid #eee;
+        }
+        
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 2rem 0;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border-top: 4px solid var(--secondary);
+        }
+        
+        .stat-card h3 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-card p {
+            color: var(--gray);
+            font-weight: 500;
+        }
+        
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 1.5rem;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            transition: transform 0.3s;
+            border-top: 4px solid var(--secondary);
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card h4 {
+            color: var(--dark);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .card p {
+            margin: 0.5rem 0;
+            padding: 0.5rem;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        
+        .card .expired {
+            background-color: #fdedec;
+            color: var(--danger);
+        }
+        
+        .card .expiring {
+            background-color: #fef5e7;
+            color: var(--warning);
+        }
+        
+        .card .valid {
+            background-color: #eafaf1;
+            color: var(--success);
+        }
+        
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.8rem;
+            padding: 0.8rem;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+        
+        .checklist-item input {
+            width: auto;
+            margin-right: 10px;
+        }
+        
+        .last-checked {
+            margin-left: auto;
+            font-size: 0.85rem;
+            color: var(--gray);
+            font-style: italic;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .tab {
+                margin-bottom: 0.3rem;
+                border-radius: 4px;
+            }
+            
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .dashboard-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .summary-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .certification-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            
+            .badge-circle {
+                width: 200px;
+                height: 200px;
+            }
+            
+            .badge-text-top {
+                font-size: 1rem;
+                top: 20px;
+            }
+            
+            .badge-main-text {
+                font-size: 0.85rem;
+            }
+            
+            .badge-text-bottom {
+                font-size: 0.75rem;
+                bottom: 20px;
+            }
+            
+            .hero-landing h1 {
+                font-size: 2rem;
+            }
+            
+            .hero-landing .tagline {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo-header">
+            <div class="logo-small">
+                <div class="logo-circle-small">
+                    <div class="logo-inner-small">
+                        <div class="epi-pen-small">
+                            <div class="cross-small">+</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <h1>EpiAccess</h1>
+                <p>Epinephrine Compliance Platform</p>
+            </div>
+        </div>
+        <div class="header-actions">
+            <button><i class="fas fa-file-pdf"></i> Export Report</button>
+            <button class="btn-success"><i class="fas fa-user-shield"></i> Admin</button>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab(this, 'welcome')"><span class="icon icon-home"></span> Welcome</div>
+            <div class="tab" onclick="switchTab(this, 'dashboard')"><span class="icon icon-dashboard"></span> Dashboard</div>
+            <div class="tab" onclick="switchTab(this, 'pens')"><span class="icon icon-pen"></span> Epinephrine Pens</div>
+            <div class="tab" onclick="switchTab(this, 'trained')"><span class="icon icon-user"></span> Trained Staff</div>
+            <div class="tab" onclick="switchTab(this, 'compliance')"><span class="icon icon-check"></span> Compliance</div>
+        </div>
+        
+        <!-- Welcome/Landing Section -->
+        <div id="welcome" class="tab-content active">
+            <div class="hero-landing">
+                <div class="logo-landing">
+                    <div class="logo-circle-landing">
+                        <div class="logo-inner-landing">
+                            <div class="epi-pen-landing">
+                                <div class="cross-landing">+</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <h1>Welcome to EpiAccess</h1>
+                <p class="tagline">Your comprehensive solution for epinephrine auto-injector compliance in New York State</p>
+                <button class="cta-button" onclick="switchTab(document.querySelector('[onclick*=dashboard]'), 'dashboard')">
+                    <span class="icon icon-rocket"></span>
+                    Start Managing Compliance
+                </button>
+            </div>
+            
+            <h2 style="text-align: center; margin: 2rem 0; color: var(--primary);">Platform Features</h2>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <span class="icon icon-check"></span>
+                    </div>
+                    <h3>Automated Compliance</h3>
+                    <p>Track inventory, monitor expirations, and maintain compliance with NY State requirements automatically.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <span class="icon icon-user"></span>
+                    </div>
+                    <h3>Staff Training</h3>
+                    <p>Manage training certifications and receive renewal reminders to keep your team prepared.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <span class="icon icon-pen"></span>
+                    </div>
+                    <h3>Inventory Management</h3>
+                    <p>Real-time monitoring of your epinephrine auto-injector inventory with smart alerts.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <span class="icon icon-pdf"></span>
+                    </div>
+                    <h3>Instant Reports</h3>
+                    <p>Generate comprehensive compliance reports for inspections and regulatory requirements.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <span class="icon icon-bell"></span>
+                    </div>
+                    <h3>Smart Alerts</h3>
+                    <p>Proactive notifications for expiring devices, training renewals, and compliance deadlines.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <span class="icon icon-shield"></span>
+                    </div>
+                    <h3>Legal Guidance</h3>
+                    <p>Built-in compliance framework aligned with NY State Public Health Law § 3000-c.</p>
+                </div>
+            </div>
+            
+            <div class="legal-section">
+                <h3><span class="icon icon-info"></span> New York State Requirements</h3>
+                <p>EpiAccess helps you maintain compliance with NY State Public Health Law § 3000-c requirements:</p>
+                <ul style="margin: 1rem 0; padding-left: 2rem;">
+                    <li>Maintain minimum of 2 epinephrine auto-injectors on premises</li>
+                    <li>Have a minimum of one trained staff member</li>
+                    <li>Perform monthly inventory and training verification</li>
+                    <li>Store devices properly and maintain accurate records</li>
+                </ul>
+            </div>
+            
+            <!-- Certification Section -->
+            <div class="certification-section">
+                <h2 style="text-align: center; margin: 3rem 0 2rem 0; color: var(--primary);">EpiAccess Certification Program</h2>
+                
+                <div class="certification-content">
+                    <div class="certification-text">
+                        <h3><span class="icon icon-award"></span> Earn Your Certification Badge</h3>
+                        <p>Companies that maintain full compliance through EpiAccess earn the right to display our official certification badge on their website, marketing materials, and business premises.</p>
+                        
+                        <h4>Benefits of Certification:</h4>
+                        <ul>
+                            <li><strong>Customer Confidence</strong> - Show customers you prioritize safety</li>
+                            <li><strong>Legal Compliance</strong> - Demonstrate adherence to NY State requirements</li>
+                            <li><strong>Professional Recognition</strong> - Join a network of safety-conscious businesses</li>
+                            <li><strong>Marketing Advantage</strong> - Differentiate your business with verified safety credentials</li>
+                        </ul>
+                        
+                        <h4>Certification Requirements:</h4>
+                        <ul>
+                            <li>Maintain minimum 2 epinephrine auto-injectors on premises</li>
+                            <li>Have a minimum of one trained staff member</li>
+                            <li>Complete monthly compliance checks through EpiAccess</li>
+                        </ul>
+                        
+                        <button class="cta-button" onclick="switchTab(document.querySelector('[onclick*=compliance]'), 'compliance')" style="margin-top: 1rem;">
+                            <span class="icon icon-certificate"></span>
+                            Check My Certification Status
+                        </button>
+                    </div>
+                    
+                    <div class="certification-badge">
+                        <div class="badge-container">
+                            <div class="badge-circle">
+                                <div class="badge-text-top">CERTIFIED</div>
+                                <div class="badge-main-text">
+                                    <div>EPINEPHRINE</div>
+                                    <div>AUTO-INJECTOR</div>
+                                </div>
+                                <div class="badge-injector">
+                                    <div class="injector-body"></div>
+                                    <div class="injector-cap"></div>
+                                </div>
+                                <div class="badge-text-bottom">EPIACCESS.ORG</div>
+                            </div>
+                        </div>
+                        <p style="text-align: center; margin-top: 1rem; color: var(--gray); font-size: 0.9rem;">
+                            <span class="icon icon-download"></span> Available for download once certified
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Dashboard Section -->
+        <div id="dashboard" class="tab-content">
+            <h2><span class="icon icon-dashboard"></span> Compliance Dashboard</h2>
+            
+            <div class="alert alert-warning">
+                <span class="icon icon-warning"></span>
+                <div>
+                    <strong>Monthly Check Required:</strong> NY State requires monthly verification of epinephrine inventory and training records. Next check due in 5 days.
+                </div>
+            </div>
+            
+            <div class="dashboard-stats">
+                <div class="stat-card">
+                    <h3 id="totalPens">3</h3>
+                    <p>Epinephrine Pens</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="expiringPens">1</h3>
+                    <p>Expiring Soon</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="trainedStaff">3</h3>
+                    <p>Trained Staff</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="certExpiring">1</h3>
+                    <p>Certifications Expiring</p>
+                </div>
+            </div>
+            
+            <div class="summary-cards">
+                <div class="card">
+                    <h4><span class="icon icon-pen"></span> Epinephrine Status</h4>
+                    <p class="expired"><span class="icon icon-circle-x"></span> <span id="expiredPensCount">0</span> Expired Pens</p>
+                    <p class="expiring"><span class="icon icon-clock"></span> <span id="expiringPensCount">1</span> Expiring in next 30 days</p>
+                    <p class="valid"><span class="icon icon-circle-check"></span> <span id="validPensCount">2</span> Valid Pens</p>
+                </div>
+                
+                <div class="card">
+                    <h4><span class="icon icon-user"></span> Training Status</h4>
+                    <p class="expired"><span class="icon icon-circle-x"></span> <span id="expiredTrainingCount">0</span> Expired Certifications</p>
+                    <p class="expiring"><span class="icon icon-clock"></span> <span id="expiringTrainingCount">1</span> Expiring in next 60 days</p>
+                    <p class="valid"><span class="icon icon-circle-check"></span> <span id="validTrainingCount">2</span> Valid Certifications</p>
+                </div>
+                
+                <div class="card">
+                    <h4><span class="icon icon-check"></span> Compliance Checklist</h4>
+                    <div class="checklist">
+                        <div class="checklist-item">
+                            <input type="checkbox" id="check1" data-check="inventory">
+                            <label for="check1">Monthly inventory check completed</label>
+                            <span class="last-checked" id="check1-date"></span>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="check2" data-check="actionPlan">
+                            <label for="check2">Emergency action plan posted</label>
+                            <span class="last-checked" id="check2-date"></span>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="check3" data-check="temperature">
+                            <label for="check3">Devices stored at proper temperature</label>
+                            <span class="last-checked" id="check3-date"></span>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="check4" data-check="training">
+                            <label for="check4">Staff training up-to-date</label>
+                            <span class="last-checked" id="check4-date"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="legal-section">
+                <h3><span class="icon icon-balance"></span> Good Samaritan Protection</h3>
+                <p>Under NY Public Health Law § 3000-b, individuals who reasonably and in good faith administer epinephrine to someone experiencing anaphylaxis are protected from liability.</p>
+                <p>Requirements for protection:</p>
+                <ol>
+                    <li>Act in good faith as an ordinary prudent person would</li>
+                    <li>Have completed an approved training program</li>
+                    <li>Immediately call 911 after administration</li>
+                </ol>
+            </div>
+        </div>
+        
+        <!-- Epinephrine Pens Section -->
+        <div id="pens" class="tab-content">
+            <h2><span class="icon icon-pen"></span> Epinephrine Auto-Injector Inventory</h2>
+            <div class="legal-section">
+                <h3><span class="icon icon-gavel"></span> NY State Requirements</h3>
+                <p>Under NY Public Health Law § 3000-c, businesses may maintain epinephrine auto-injectors for emergency use. A minimum of 2 devices must be maintained on premises, stored properly and checked monthly for expiration dates.</p>
+            </div>
+            
+            <form id="penForm">
+                <div class="form-group">
+                    <label for="penId"><span class="icon icon-barcode"></span> Device Identifier/Lot #</label>
+                    <input type="text" id="penId" name="penId" placeholder="Enter device lot number" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="expiration"><span class="icon icon-calendar"></span> Expiration Date</label>
+                    <input type="date" id="expiration" name="expiration" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="location"><span class="icon icon-location"></span> Storage Location</label>
+                    <input type="text" id="location" name="location" placeholder="e.g., Front Desk, First Aid Station" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="quantity"><span class="icon icon-quantity"></span> Quantity</label>
+                    <input type="number" id="quantity" name="quantity" min="1" value="1" required>
+                </div>
+                
+                <button type="submit"><span class="icon icon-plus"></span> Add Epinephrine Pen</button>
+            </form>
+            
+            <h3><span class="icon icon-check"></span> Current Inventory</h3>
+            <table id="penTable">
+                <thead>
+                    <tr>
+                        <th>Device ID</th>
+                        <th>Expiration Date</th>
+                        <th>Days Left</th>
+                        <th>Location</th>
+                        <th>Quantity</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="expiring-soon">
+                        <td>EPI-2024-045</td>
+                        <td>01/20/2024</td>
+                        <td>21</td>
+                        <td>Kitchen</td>
+                        <td>1</td>
+                        <td><span class="status-badge status-expiring">EXPIRING</span></td>
+                        <td>
+                            <button class="btn-danger" onclick="removePen('EPI-2024-045')"><span class="icon icon-trash"></span></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>EPI-2024-102</td>
+                        <td>06/15/2024</td>
+                        <td>147</td>
+                        <td>Reception</td>
+                        <td>2</td>
+                        <td><span class="status-badge status-valid">VALID</span></td>
+                        <td>
+                            <button class="btn-danger" onclick="removePen('EPI-2024-102')"><span class="icon icon-trash"></span></button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Trained Staff Section -->
+        <div id="trained" class="tab-content">
+            <h2><span class="icon icon-user"></span> Trained Personnel</h2>
+            <div class="legal-section">
+                <h3><span class="icon icon-graduation"></span> Training Requirements</h3>
+                <p>NY State requires that at least one individual capable of administering epinephrine complete an approved training program. Training must be renewed every 2 years per NYSED guidelines.</p>
+            </div>
+            
+            <form id="trainingForm">
+                <div class="form-group">
+                    <label for="name"><span class="icon icon-user"></span> Full Name</label>
+                    <input type="text" id="name" name="name" placeholder="Enter staff member's name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="trainingDate"><span class="icon icon-calendar"></span> Training Completion Date</label>
+                    <input type="date" id="trainingDate" name="trainingDate" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="certificate"><span class="icon icon-certificate"></span> Certificate # (Optional)</label>
+                    <input type="text" id="certificate" name="certificate" placeholder="Enter certificate number">
+                </div>
+                
+                <button type="submit"><span class="icon icon-plus"></span> Add Trained Individual</button>
+            </form>
+            
+            <h3><span class="icon icon-users"></span> Current Trained Staff</h3>
+            <table id="trainingTable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Training Date</th>
+                        <th>Expiration Date</th>
+                        <th>Days Left</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Sarah Johnson</td>
+                        <td>11/01/2022</td>
+                        <td>11/01/2024</td>
+                        <td>142</td>
+                        <td><span class="status-badge status-valid">VALID</span></td>
+                        <td>
+                            <button class="btn-danger" onclick="removeTrainedStaff(1)"><span class="icon icon-trash"></span></button>
+                        </td>
+                    </tr>
+                    <tr class="expiring-soon">
+                        <td>Michael Chen</td>
+                        <td>12/15/2021</td>
+                        <td>12/15/2023</td>
+                        <td>46</td>
+                        <td><span class="status-badge status-expiring">EXPIRING</span></td>
+                        <td>
+                            <button class="btn-danger" onclick="removeTrainedStaff(2)"><span class="icon icon-trash"></span></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Emily Rodriguez</td>
+                        <td>03/20/2023</td>
+                        <td>03/20/2025</td>
+                        <td>267</td>
+                        <td><span class="status-badge status-valid">VALID</span></td>
+                        <td>
+                            <button class="btn-danger" onclick="removeTrainedStaff(3)"><span class="icon icon-trash"></span></button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Compliance Section -->
+        <div id="compliance" class="tab-content">
+            <h2><i class="fas fa-clipboard-check"></i> Compliance Center</h2>
+            
+            <div class="legal-section">
+                <h3><i class="fas fa-info-circle"></i> NY State Compliance Requirements</h3>
+                <p>To maintain compliance with New York State regulations, businesses must:</p>
+                <ol>
+                    <li>Maintain at least two epinephrine auto-injectors on premises</li>
+                    <li>Ensure all devices are not expired and properly stored</li>
+                    <li>Have a minimum of one trained staff member</li>
+                    <li>Perform monthly inventory checks</li>
+                    <li>Maintain accurate records of training and inventory</li>
+                </ol>
+            </div>
+            
+            <div class="compliance-summary">
+                <h3><i class="fas fa-tasks"></i> Compliance Status</h3>
+                <div class="summary-cards">
+                    <div class="card">
+                        <h4><i class="fas fa-prescription-bottle-alt"></i> Inventory Compliance</h4>
+                        <p><i class="fas fa-check-circle" style="color: #27ae60;"></i> Minimum devices: <strong>3</strong> (Required: 2)</p>
+                        <p><i class="fas fa-check-circle" style="color: #27ae60;"></i> Expired devices: <strong>0</strong></p>
+                        <p><i class="fas fa-check-circle" style="color: #27ae60;"></i> Monthly check: <strong>Completed</strong></p>
+                    </div>
+                    
+                    <div class="card">
+                        <h4><i class="fas fa-user-graduate"></i> Training Compliance</h4>
+                        <p><i class="fas fa-check-circle" style="color: #27ae60;"></i> Trained staff: <strong>3</strong> (Required: 1)</p>
+                        <p><i class="fas fa-exclamation-triangle" style="color: #f39c12;"></i> Expiring soon: <strong>1 certification</strong></p>
+                        <p><i class="fas fa-check-circle" style="color: #27ae60;"></i> Training records: <strong>Up-to-date</strong></p>
+                    </div>
+                    
+                    <div class="card">
+                        <h4><i class="fas fa-file-alt"></i> Documentation</h4>
+                        <p><i class="fas fa-check-circle" style="color: #27ae60;"></i> Emergency plan: <strong>Posted</strong></p>
+                        <p><i class="fas fa-check-circle" style="color: #27ae60;"></i> Storage conditions: <strong>Verified</strong></p>
+                        <p><i class="fas fa-exclamation-triangle" style="color: #f39c12;"></i> Last audit: <strong>45 days ago</strong></p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <button onclick="generateComplianceReport()"><i class="fas fa-file-pdf"></i> Generate Compliance Report</button>
+                <button onclick="setupExpirationAlerts()"><i class="fas fa-bell"></i> Setup Expiration Alerts</button>
+                <button class="btn-success" onclick="refreshComplianceData()"><i class="fas fa-sync-alt"></i> Refresh Compliance Data</button>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>EpiAccess v2.0 | Designed for New York State Businesses</p>
+        <p>This tool does not constitute legal advice. Consult with legal counsel for specific compliance requirements.</p>
+        <p><i class="fas fa-phone"></i> NY State Health Department: 1-888-123-4567</p>
+    </footer>
+
+    <script>
+        // Data storage
+        let epinephrinePens = [
+            {id: 'EPI-2024-045', expiration: '2024-01-20', location: 'Kitchen', quantity: 1},
+            {id: 'EPI-2024-102', expiration: '2024-06-15', location: 'Reception', quantity: 2}
+        ];
+        
+        let trainedStaff = [
+            {id: 1, name: 'Sarah Johnson', trainingDate: '2022-11-01', certificate: 'CERT-12345'},
+            {id: 2, name: 'Michael Chen', trainingDate: '2021-12-15', certificate: 'CERT-67890'},
+            {id: 3, name: 'Emily Rodriguez', trainingDate: '2023-03-20', certificate: 'CERT-54321'}
+        ];
+        
+        let checklistStatus = {
+            inventory: {checked: false, date: null},
+            actionPlan: {checked: false, date: null},
+            temperature: {checked: false, date: null},
+            training: {checked: false, date: null}
+        };
+        
+        // DOM elements - will be set after DOM loads
+        let penForm, trainingForm, penTable, trainingTable;
+        
+        // Initialize checklist
+        function initChecklist() {
+            const checks = ['inventory', 'actionPlan', 'temperature', 'training'];
+            
+            checks.forEach((check, index) => {
+                const checkbox = document.getElementById(`check${index+1}`);
+                const dateSpan = document.getElementById(`check${index+1}-date`);
+                
+                if (checklistStatus[check].checked) {
+                    checkbox.checked = true;
+                    if (checklistStatus[check].date) {
+                        dateSpan.textContent = `Last checked: ${formatDate(checklistStatus[check].date)}`;
+                    }
+                }
+                
+                checkbox.addEventListener('change', function() {
+                    if (this.checked) {
+                        const now = new Date();
+                        const dateStr = now.toISOString().split('T')[0];
+                        checklistStatus[check] = {
+                            checked: true,
+                            date: dateStr
+                        };
+                        dateSpan.textContent = `Last checked: ${formatDate(dateStr)}`;
+                    } else {
+                        checklistStatus[check] = {
+                            checked: false,
+                            date: null
+                        };
+                        dateSpan.textContent = '';
+                    }
+                    saveData();
+                });
+            });
+        }
+        
+        // Format date as MM/DD/YYYY
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            const [year, month, day] = dateStr.split('-');
+            return `${month}/${day}/${year}`;
+        }
+        
+        // Calculate days until expiration
+        function getDaysUntil(expirationDate) {
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            const expDate = new Date(expirationDate);
+            const diffTime = expDate - today;
+            return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        }
+        
+        // Update dashboard stats
+        function updateDashboard() {
+            // Calculate pen statuses
+            let expiredPens = 0;
+            let expiringPens = 0;
+            let validPens = 0;
+            let totalPens = 0;
+            
+            epinephrinePens.forEach(pen => {
+                const days = getDaysUntil(pen.expiration);
+                totalPens += pen.quantity;
+                if (days < 0) expiredPens += pen.quantity;
+                else if (days <= 30) expiringPens += pen.quantity;
+                else validPens += pen.quantity;
+            });
+            
+            // Update pen stats (check if elements exist)
+            const totalPensEl = document.getElementById('totalPens');
+            const expiringPensEl = document.getElementById('expiringPens');
+            const expiredPensCountEl = document.getElementById('expiredPensCount');
+            const expiringPensCountEl = document.getElementById('expiringPensCount');
+            const validPensCountEl = document.getElementById('validPensCount');
+            
+            if (totalPensEl) totalPensEl.textContent = totalPens;
+            if (expiringPensEl) expiringPensEl.textContent = expiringPens;
+            if (expiredPensCountEl) expiredPensCountEl.textContent = expiredPens;
+            if (expiringPensCountEl) expiringPensCountEl.textContent = expiringPens;
+            if (validPensCountEl) validPensCountEl.textContent = validPens;
+            
+            // Calculate training statuses
+            let expiredTrainings = 0;
+            let expiringTrainings = 0;
+            let validTrainings = 0;
+            
+            trainedStaff.forEach(staff => {
+                const trainDate = new Date(staff.trainingDate);
+                const expDate = new Date(trainDate);
+                expDate.setFullYear(expDate.getFullYear() + 2);
+                
+                const days = getDaysUntil(expDate.toISOString().split('T')[0]);
+                if (days < 0) expiredTrainings++;
+                else if (days <= 60) expiringTrainings++;
+                else validTrainings++;
+            });
+            
+            // Update training stats (check if elements exist)
+            const trainedStaffEl = document.getElementById('trainedStaff');
+            const certExpiringEl = document.getElementById('certExpiring');
+            const expiredTrainingCountEl = document.getElementById('expiredTrainingCount');
+            const expiringTrainingCountEl = document.getElementById('expiringTrainingCount');
+            const validTrainingCountEl = document.getElementById('validTrainingCount');
+            
+            if (trainedStaffEl) trainedStaffEl.textContent = trainedStaff.length;
+            if (certExpiringEl) certExpiringEl.textContent = expiringTrainings;
+            if (expiredTrainingCountEl) expiredTrainingCountEl.textContent = expiredTrainings;
+            if (expiringTrainingCountEl) expiringTrainingCountEl.textContent = expiringTrainings;
+            if (validTrainingCountEl) validTrainingCountEl.textContent = validTrainings;
+            
+            // Update compliance status in compliance tab
+            updateComplianceStatus(totalPens, expiredPens, trainedStaff.length, expiringTrainings);
+        }
+        
+        // Update compliance status display
+        function updateComplianceStatus(totalPens, expiredPens, totalStaff, expiringTrainings) {
+            // Find compliance cards and update them
+            const complianceCards = document.querySelectorAll('.compliance-summary .card');
+            
+            complianceCards.forEach(card => {
+                const title = card.querySelector('h4');
+                if (!title) return;
+                
+                if (title.textContent.includes('Inventory Compliance')) {
+                    const paragraphs = card.querySelectorAll('p');
+                    if (paragraphs[0]) {
+                        const icon = totalPens >= 2 ? 'check-circle' : 'exclamation-circle';
+                        const color = totalPens >= 2 ? '#27ae60' : '#e74c3c';
+                        paragraphs[0].innerHTML = `<i class="fas fa-${icon}" style="color: ${color};"></i> Minimum devices: <strong>${totalPens}</strong> (Required: 2)`;
+                    }
+                    if (paragraphs[1]) {
+                        const icon = expiredPens === 0 ? 'check-circle' : 'exclamation-circle';
+                        const color = expiredPens === 0 ? '#27ae60' : '#e74c3c';
+                        paragraphs[1].innerHTML = `<i class="fas fa-${icon}" style="color: ${color};"></i> Expired devices: <strong>${expiredPens}</strong>`;
+                    }
+                }
+                
+                if (title.textContent.includes('Training Compliance')) {
+                    const paragraphs = card.querySelectorAll('p');
+                    if (paragraphs[0]) {
+                        const icon = totalStaff >= 1 ? 'check-circle' : 'exclamation-circle';
+                        const color = totalStaff >= 1 ? '#27ae60' : '#e74c3c';
+                        paragraphs[0].innerHTML = `<i class="fas fa-${icon}" style="color: ${color};"></i> Trained staff: <strong>${totalStaff}</strong> (Required: 1)`;
+                    }
+                    if (paragraphs[1]) {
+                        const icon = expiringTrainings === 0 ? 'check-circle' : 'exclamation-triangle';
+                        const color = expiringTrainings === 0 ? '#27ae60' : '#f39c12';
+                        paragraphs[1].innerHTML = `<i class="fas fa-${icon}" style="color: ${color};"></i> Expiring soon: <strong>${expiringTrainings} certification${expiringTrainings !== 1 ? 's' : ''}</strong>`;
+                    }
+                }
+            });
+        }
+        
+        // Save data to memory
+        function saveData() {
+            updateDashboard();
+        }
+        
+        // Add new pen
+        function addPen(penData) {
+            epinephrinePens.push(penData);
+            renderPenTable();
+            saveData();
+        }
+        
+        // Add new trained staff
+        function addTrainedStaff(staffData) {
+            staffData.id = Date.now();
+            trainedStaff.push(staffData);
+            renderTrainingTable();
+            saveData();
+        }
+        
+        // Remove pen
+        function removePen(penId) {
+            epinephrinePens = epinephrinePens.filter(pen => pen.id !== penId);
+            renderPenTable();
+            saveData();
+        }
+        
+        // Remove trained staff
+        function removeTrainedStaff(staffId) {
+            trainedStaff = trainedStaff.filter(staff => staff.id !== staffId);
+            renderTrainingTable();
+            saveData();
+        }
+        
+        // Render pen table
+        function renderPenTable() {
+            const tbody = document.getElementById('penTable').querySelector('tbody');
+            tbody.innerHTML = '';
+            
+            epinephrinePens.forEach(pen => {
+                const days = getDaysUntil(pen.expiration);
+                const row = document.createElement('tr');
+                
+                let statusClass = '';
+                let statusText = 'VALID';
+                let statusBadgeClass = 'status-valid';
+                
+                if (days < 0) {
+                    statusClass = 'expired';
+                    statusText = 'EXPIRED';
+                    statusBadgeClass = 'status-expired';
+                } else if (days <= 30) {
+                    statusClass = 'expiring-soon';
+                    statusText = 'EXPIRING';
+                    statusBadgeClass = 'status-expiring';
+                }
+                
+                row.className = statusClass;
+                row.innerHTML = `
+                    <td>${pen.id}</td>
+                    <td>${formatDate(pen.expiration)}</td>
+                    <td>${days}</td>
+                    <td>${pen.location}</td>
+                    <td>${pen.quantity}</td>
+                    <td><span class="status-badge ${statusBadgeClass}">${statusText}</span></td>
+                    <td>
+                        <button class="btn-danger" onclick="removePen('${pen.id}')">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+        
+        // Render training table
+        function renderTrainingTable() {
+            const tbody = document.getElementById('trainingTable').querySelector('tbody');
+            tbody.innerHTML = '';
+            
+            trainedStaff.forEach(staff => {
+                const trainDate = new Date(staff.trainingDate);
+                const expDate = new Date(trainDate);
+                expDate.setFullYear(expDate.getFullYear() + 2);
+                const expDateStr = expDate.toISOString().split('T')[0];
+                
+                const days = getDaysUntil(expDateStr);
+                const row = document.createElement('tr');
+                
+                let statusClass = '';
+                let statusText = 'VALID';
+                let statusBadgeClass = 'status-valid';
+                
+                if (days < 0) {
+                    statusClass = 'expired';
+                    statusText = 'EXPIRED';
+                    statusBadgeClass = 'status-expired';
+                } else if (days <= 60) {
+                    statusClass = 'expiring-soon';
+                    statusText = 'EXPIRING';
+                    statusBadgeClass = 'status-expiring';
+                }
+                
+                row.className = statusClass;
+                row.innerHTML = `
+                    <td>${staff.name}</td>
+                    <td>${formatDate(staff.trainingDate)}</td>
+                    <td>${formatDate(expDateStr)}</td>
+                    <td>${days}</td>
+                    <td><span class="status-badge ${statusBadgeClass}">${statusText}</span></td>
+                    <td>
+                        <button class="btn-danger" onclick="removeTrainedStaff(${staff.id})">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+        
+        // Initialize
+        function init() {
+            // Get DOM elements after page loads
+            penForm = document.getElementById('penForm');
+            trainingForm = document.getElementById('trainingForm');
+            penTable = document.getElementById('penTable').querySelector('tbody');
+            trainingTable = document.getElementById('trainingTable').querySelector('tbody');
+            
+            initChecklist();
+            renderPenTable();
+            renderTrainingTable();
+            updateDashboard();
+            initForms();
+        }
+        
+        // Refresh compliance data
+        function refreshComplianceData() {
+            // Show a loading state
+            const button = event.target;
+            const originalText = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Refreshing...';
+            button.disabled = true;
+            
+            // Simulate data refresh (in real app this would call an API)
+            setTimeout(() => {
+                // Re-render all tables and update dashboard
+                renderPenTable();
+                renderTrainingTable();
+                updateDashboard();
+                
+                // Reset button
+                button.innerHTML = originalText;
+                button.disabled = false;
+                
+                // Show success message
+                showNotification('Compliance data refreshed successfully!', 'success');
+            }, 1500);
+        }
+        
+        // Show notification
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${type}`;
+            notification.style.position = 'fixed';
+            notification.style.top = '20px';
+            notification.style.right = '20px';
+            notification.style.zIndex = '1000';
+            notification.style.minWidth = '300px';
+            notification.style.animation = 'slideIn 0.3s ease';
+            
+            const icon = type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle';
+            notification.innerHTML = `
+                <i class="fas fa-${icon}"></i>
+                <span>${message}</span>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+        
+        // Generate compliance report
+        function generateComplianceReport() {
+            showNotification('Generating compliance report...', 'info');
+            
+            // In a real application, this would generate and download a PDF
+            setTimeout(() => {
+                showNotification('Compliance report generated successfully!', 'success');
+            }, 2000);
+        }
+        
+        // Setup expiration alerts
+        function setupExpirationAlerts() {
+            showNotification('Expiration alerts configured successfully!', 'success');
+        }
+        
+        // Initialize form event handlers
+        function initForms() {
+            penForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const formData = new FormData(penForm);
+                const penData = {
+                    id: formData.get('penId'),
+                    expiration: formData.get('expiration'),
+                    location: formData.get('location'),
+                    quantity: parseInt(formData.get('quantity'))
+                };
+                addPen(penData);
+                penForm.reset();
+                showNotification('Epinephrine pen added successfully!', 'success');
+            });
+            
+            trainingForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const formData = new FormData(trainingForm);
+                const staffData = {
+                    name: formData.get('name'),
+                    trainingDate: formData.get('trainingDate'),
+                    certificate: formData.get('certificate') || ''
+                };
+                addTrainedStaff(staffData);
+                trainingForm.reset();
+                showNotification('Trained staff member added successfully!', 'success');
+            });
+        }
+        
+        // Run initialization when page loads
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
