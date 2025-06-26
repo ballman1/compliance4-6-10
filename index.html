@@ -2,6 +2,86 @@
 <html lang="en">
 <head>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+  const supabaseUrl = 'YOUR_SUPABASE_URL';
+  const supabaseKey = 'YOUR_SUPABASE_ANON_KEY';
+  const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+  async function signInWithGoogle() {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google'
+    });
+    if (error) alert('Google sign-in error: ' + error.message);
+  }
+
+  async function signOut() {
+    await supabase.auth.signOut();
+    location.reload();
+  }
+
+  // Update UI based on auth state
+  async function updateAuthUI() {
+    const { data: { user } } = await supabase.auth.getUser();
+    const signinBtn = document.getElementById('google-signin-btn');
+    const signoutBtn = document.getElementById('signout-btn');
+    const userEmail = document.getElementById('user-email');
+    if (user) {
+      signinBtn.style.display = 'none';
+      signoutBtn.style.display = 'inline-block';
+      userEmail.textContent = user.email;
+    } else {
+      signinBtn.style.display = 'inline-block';
+      signoutBtn.style.display = 'none';
+      userEmail.textContent = '';
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', updateAuthUI);
+
+  // Listen for auth state changes
+  supabase.auth.onAuthStateChange((event, session) => {
+    updateAuthUI();
+  });
+   // Store checklist for logged-in user
+async function saveChecklistToSupabase() {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return;
+  // Prepare checklist data as object
+  const checklist = JSON.stringify(checklistStatus);
+  // Upsert to supabase (replace 'compliance_checklists' with your table name)
+  await supabase.from('compliance_checklists').upsert([
+    { user_id: user.id, checklist }
+  ]);
+}
+
+// Update your checklist checkbox handler in initChecklist()
+function initChecklist() {
+  const checks = ['inventory', 'actionPlan', 'temperature', 'training'];
+  checks.forEach((check, index) => {
+    const checkbox = document.getElementById(`check${index+1}`);
+    const dateSpan = document.getElementById(`check${index+1}-date`);
+    if (checklistStatus[check].checked) {
+      checkbox.checked = true;
+      if (checklistStatus[check].date) {
+        dateSpan.textContent = `Last checked: ${formatDate(checklistStatus[check].date)}`;
+      }
+    }
+    checkbox.addEventListener('change', async function() {
+      if (this.checked) {
+        const now = new Date();
+        const dateStr = now.toISOString().split('T')[0];
+        checklistStatus[check] = { checked: true, date: dateStr };
+        dateSpan.textContent = `Last checked: ${formatDate(dateStr)}`;
+      } else {
+        checklistStatus[check] = { checked: false, date: null };
+        dateSpan.textContent = '';
+      }
+      saveData();
+      await saveChecklistToSupabase(); // Save to Supabase after any change
+    });
+  });
+}     
+</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EpiAccess.org - Epinephrine Compliance Platform</title>
@@ -770,6 +850,11 @@
     </header>
     
     <div class="container">
+        <div id="auth-area" style="text-align:right; margin-bottom:1.5rem;">
+  <button id="google-signin-btn" onclick="signInWithGoogle()" style="display:inline-block;"><span class="icon icon-user"></span> Sign in with Google</button>
+  <button id="signout-btn" onclick="signOut()" style="display:none;">Sign out</button>
+  <span id="user-email" style="margin-left:15px; color:var(--primary); font-weight:bold;"></span>
+</div>
         <div class="tabs">
             <div class="tab active" onclick="switchTab(this, 'welcome')"><span class="icon icon-home"></span> Welcome</div>
             <div class="tab" onclick="switchTab(this, 'dashboard')"><span class="icon icon-dashboard"></span> Dashboard</div>
