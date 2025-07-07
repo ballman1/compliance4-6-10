@@ -2,115 +2,9 @@
 <html lang="en">
 <head>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script>
-  const supabaseUrl = 'https://uuwapdxeykmbjcsoxciu.supabase.co';
-  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1d2FwZHhleWttYmpjc294Y2l1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk1ODkyMTQsImV4cCI6MjA2NTE2NTIxNH0.TSPxr3_eIiSe4jINf5AzlO5ejfcxtZe_F9qY5wsZiFk';
-  const supabase = supabase.createClient(supabaseUrl, supabaseKey);
-
-  async function signInWithGoogle() {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google'
-    });
-    if (error) alert('Google sign-in error: ' + error.message);
-  }
-
-  async function signOut() {
-    await supabase.auth.signOut();
-    location.reload();
-  }
-
-  // Update UI based on auth state
-  async function updateAuthUI() {
-    const { data: { user } } = await supabase.auth.getUser();
-    const signinBtn = document.getElementById('google-signin-btn');
-    const signoutBtn = document.getElementById('signout-btn');
-    const userEmail = document.getElementById('user-email');
-    if (user) {
-      signinBtn.style.display = 'none';
-      signoutBtn.style.display = 'inline-block';
-      userEmail.textContent = user.email;
-    } else {
-      signinBtn.style.display = 'inline-block';
-      signoutBtn.style.display = 'none';
-      userEmail.textContent = '';
-    }
-  }
-
-  document.addEventListener('DOMContentLoaded', updateAuthUI);
-
-  // Listen for auth state changes
-  supabase.auth.onAuthStateChange((event, session) => {
-    updateAuthUI();
-  });
-   // Store checklist for logged-in user
-async function saveChecklistToSupabase() {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return;
-  // Prepare checklist data as object
-  const checklist = JSON.stringify(checklistStatus);
-  // Upsert to supabase (replace 'compliance_checklists' with your table name)
-  await supabase.from('compliance_checklists').upsert([
-    { user_id: user.id, checklist }
-  ]);
-}
-
-// Update your checklist checkbox handler in initChecklist()
-function initChecklist() {
-  const checks = ['inventory', 'actionPlan', 'temperature', 'training'];
-  checks.forEach((check, index) => {
-    const checkbox = document.getElementById(`check${index+1}`);
-    const dateSpan = document.getElementById(`check${index+1}-date`);
-    if (checklistStatus[check].checked) {
-      checkbox.checked = true;
-      if (checklistStatus[check].date) {
-        dateSpan.textContent = `Last checked: ${formatDate(checklistStatus[check].date)}`;
-      }
-    }
-    checkbox.addEventListener('change', async function() {
-      if (this.checked) {
-        const now = new Date();
-        const dateStr = now.toISOString().split('T')[0];
-        checklistStatus[check] = { checked: true, date: dateStr };
-        dateSpan.textContent = `Last checked: ${formatDate(dateStr)}`;
-      } else {
-        checklistStatus[check] = { checked: false, date: null };
-        dateSpan.textContent = '';
-      }
-      saveData();
-      await saveChecklistToSupabase(); // Save to Supabase after any change
-    });
-  });
-}     
-</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EpiAccess.org - Epinephrine Compliance Platform</title>
-    <script>
-        function switchTab(clickedTab, tabName) {
-            // Hide all tab contents
-            const contents = document.querySelectorAll('.tab-content');
-            contents.forEach(content => {
-                content.classList.remove('active');
-            });
-            
-            // Remove active from all tabs
-            const tabs = document.querySelectorAll('.tab');
-            tabs.forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            // Show selected content
-            const targetContent = document.getElementById(tabName);
-            if (targetContent) {
-                targetContent.classList.add('active');
-            }
-            
-            // Activate clicked tab
-            if (clickedTab) {
-                clickedTab.classList.add('active');
-            }
-        }
-    </script>
     <style>
         :root {
             --primary: #1e3a5f;
@@ -844,17 +738,17 @@ function initChecklist() {
             </div>
         </div>
         <div class="header-actions">
-            <button><i class="fas fa-file-pdf"></i> Export Report</button>
-            <button class="btn-success"><i class="fas fa-user-shield"></i> Admin</button>
+            <button><span class="icon icon-pdf"></span> Export Report</button>
+            <button class="btn-success"><span class="icon icon-shield"></span> Admin</button>
         </div>
     </header>
     
     <div class="container">
         <div id="auth-area" style="text-align:right; margin-bottom:1.5rem;">
-  <button id="google-signin-btn" onclick="signInWithGoogle()" style="display:inline-block;"><span class="icon icon-user"></span> Sign in with Google</button>
-  <button id="signout-btn" onclick="signOut()" style="display:none;">Sign out</button>
-  <span id="user-email" style="margin-left:15px; color:var(--primary); font-weight:bold;"></span>
-</div>
+          <button id="google-signin-btn" onclick="signInWithGoogle()" style="display:inline-block;"><span class="icon icon-user"></span> Sign in with Google</button>
+          <button id="signout-btn" onclick="signOut()" style="display:none;">Sign out</button>
+          <span id="user-email" style="margin-left:15px; color:var(--primary); font-weight:bold;"></span>
+        </div>
         <div class="tabs">
             <div class="tab active" onclick="switchTab(this, 'welcome')"><span class="icon icon-home"></span> Welcome</div>
             <div class="tab" onclick="switchTab(this, 'dashboard')"><span class="icon icon-dashboard"></span> Dashboard</div>
@@ -1129,28 +1023,7 @@ function initChecklist() {
                     </tr>
                 </thead>
                 <tbody>
-                    <tr class="expiring-soon">
-                        <td>EPI-2024-045</td>
-                        <td>01/20/2024</td>
-                        <td>21</td>
-                        <td>Kitchen</td>
-                        <td>1</td>
-                        <td><span class="status-badge status-expiring">EXPIRING</span></td>
-                        <td>
-                            <button class="btn-danger" onclick="removePen('EPI-2024-045')"><span class="icon icon-trash"></span></button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>EPI-2024-102</td>
-                        <td>06/15/2024</td>
-                        <td>147</td>
-                        <td>Reception</td>
-                        <td>2</td>
-                        <td><span class="status-badge status-valid">VALID</span></td>
-                        <td>
-                            <button class="btn-danger" onclick="removePen('EPI-2024-102')"><span class="icon icon-trash"></span></button>
-                        </td>
-                    </tr>
+                    <!-- Table rows will be populated by JavaScript -->
                 </tbody>
             </table>
         </div>
@@ -1195,46 +1068,17 @@ function initChecklist() {
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>Sarah Johnson</td>
-                        <td>11/01/2022</td>
-                        <td>11/01/2024</td>
-                        <td>142</td>
-                        <td><span class="status-badge status-valid">VALID</span></td>
-                        <td>
-                            <button class="btn-danger" onclick="removeTrainedStaff(1)"><span class="icon icon-trash"></span></button>
-                        </td>
-                    </tr>
-                    <tr class="expiring-soon">
-                        <td>Michael Chen</td>
-                        <td>12/15/2021</td>
-                        <td>12/15/2023</td>
-                        <td>46</td>
-                        <td><span class="status-badge status-expiring">EXPIRING</span></td>
-                        <td>
-                            <button class="btn-danger" onclick="removeTrainedStaff(2)"><span class="icon icon-trash"></span></button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Emily Rodriguez</td>
-                        <td>03/20/2023</td>
-                        <td>03/20/2025</td>
-                        <td>267</td>
-                        <td><span class="status-badge status-valid">VALID</span></td>
-                        <td>
-                            <button class="btn-danger" onclick="removeTrainedStaff(3)"><span class="icon icon-trash"></span></button>
-                        </td>
-                    </tr>
+                    <!-- Table rows will be populated by JavaScript -->
                 </tbody>
             </table>
         </div>
         
         <!-- Compliance Section -->
         <div id="compliance" class="tab-content">
-            <h2><i class="fas fa-clipboard-check"></i> Compliance Center</h2>
+            <h2><span class="icon icon-tasks"></span> Compliance Center</h2>
             
             <div class="legal-section">
-                <h3><i class="fas fa-info-circle"></i> NY State Compliance Requirements</h3>
+                <h3><span class="icon icon-info"></span> NY State Compliance Requirements</h3>
                 <p>To maintain compliance with New York State regulations, businesses must:</p>
                 <ol>
                     <li>Maintain at least two epinephrine auto-injectors on premises</li>
@@ -1246,35 +1090,35 @@ function initChecklist() {
             </div>
             
             <div class="compliance-summary">
-                <h3><i class="fas fa-tasks"></i> Compliance Status</h3>
+                <h3><span class="icon icon-tasks"></span> Compliance Status</h3>
                 <div class="summary-cards">
                     <div class="card">
-                        <h4><i class="fas fa-prescription-bottle-alt"></i> Inventory Compliance</h4>
-                        <p><i class="fas fa-check-circle" style="color: #27ae60;"></i> Minimum devices: <strong>3</strong> (Required: 2)</p>
-                        <p><i class="fas fa-check-circle" style="color: #27ae60;"></i> Expired devices: <strong>0</strong></p>
-                        <p><i class="fas fa-check-circle" style="color: #27ae60;"></i> Monthly check: <strong>Completed</strong></p>
+                        <h4><span class="icon icon-pen"></span> Inventory Compliance</h4>
+                        <p><span class="icon icon-circle-check" style="color: #27ae60;"></span> Minimum devices: <strong>3</strong> (Required: 2)</p>
+                        <p><span class="icon icon-circle-check" style="color: #27ae60;"></span> Expired devices: <strong>0</strong></p>
+                        <p><span class="icon icon-circle-check" style="color: #27ae60;"></span> Monthly check: <strong>Completed</strong></p>
                     </div>
                     
                     <div class="card">
-                        <h4><i class="fas fa-user-graduate"></i> Training Compliance</h4>
-                        <p><i class="fas fa-check-circle" style="color: #27ae60;"></i> Trained staff: <strong>3</strong> (Required: 1)</p>
-                        <p><i class="fas fa-exclamation-triangle" style="color: #f39c12;"></i> Expiring soon: <strong>1 certification</strong></p>
-                        <p><i class="fas fa-check-circle" style="color: #27ae60;"></i> Training records: <strong>Up-to-date</strong></p>
+                        <h4><span class="icon icon-user"></span> Training Compliance</h4>
+                        <p><span class="icon icon-circle-check" style="color: #27ae60;"></span> Trained staff: <strong>3</strong> (Required: 1)</p>
+                        <p><span class="icon icon-triangle" style="color: #f39c12;"></span> Expiring soon: <strong>1 certification</strong></p>
+                        <p><span class="icon icon-circle-check" style="color: #27ae60;"></span> Training records: <strong>Up-to-date</strong></p>
                     </div>
                     
                     <div class="card">
-                        <h4><i class="fas fa-file-alt"></i> Documentation</h4>
-                        <p><i class="fas fa-check-circle" style="color: #27ae60;"></i> Emergency plan: <strong>Posted</strong></p>
-                        <p><i class="fas fa-check-circle" style="color: #27ae60;"></i> Storage conditions: <strong>Verified</strong></p>
-                        <p><i class="fas fa-exclamation-triangle" style="color: #f39c12;"></i> Last audit: <strong>45 days ago</strong></p>
+                        <h4><span class="icon icon-file"></span> Documentation</h4>
+                        <p><span class="icon icon-circle-check" style="color: #27ae60;"></span> Emergency plan: <strong>Posted</strong></p>
+                        <p><span class="icon icon-circle-check" style="color: #27ae60;"></span> Storage conditions: <strong>Verified</strong></p>
+                        <p><span class="icon icon-triangle" style="color: #f39c12;"></span> Last audit: <strong>45 days ago</strong></p>
                     </div>
                 </div>
             </div>
             
             <div class="action-buttons">
-                <button onclick="generateComplianceReport()"><i class="fas fa-file-pdf"></i> Generate Compliance Report</button>
-                <button onclick="setupExpirationAlerts()"><i class="fas fa-bell"></i> Setup Expiration Alerts</button>
-                <button class="btn-success" onclick="refreshComplianceData()"><i class="fas fa-sync-alt"></i> Refresh Compliance Data</button>
+                <button onclick="generateComplianceReport()"><span class="icon icon-pdf"></span> Generate Compliance Report</button>
+                <button onclick="setupExpirationAlerts()"><span class="icon icon-bell"></span> Setup Expiration Alerts</button>
+                <button class="btn-success" onclick="refreshComplianceData()"><span class="icon icon-sync"></span> Refresh Compliance Data</button>
             </div>
         </div>
     </div>
@@ -1282,10 +1126,17 @@ function initChecklist() {
     <footer>
         <p>EpiAccess v2.0 | Designed for New York State Businesses</p>
         <p>This tool does not constitute legal advice. Consult with legal counsel for specific compliance requirements.</p>
-        <p><i class="fas fa-phone"></i> NY State Health Department: 1-888-123-4567</p>
+        <p><span class="icon icon-phone"></span> NY State Health Department: 1-888-123-4567</p>
     </footer>
 
     <script>
+        // IMPORTANT FIX: Use window.supabase instead of supabase
+        const supabaseUrl = 'https://uuwapdxeykmbjcsoxciu.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1d2FwZHhleWttYmpjc294Y2l1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk1ODkyMTQsImV4cCI6MjA2NTE2NTIxNH0.TSPxr3_eIiSe4jINf5AzlO5ejfcxtZe_F9qY5wsZiFk';
+        
+        // THIS IS THE KEY FIX!
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        
         // Data storage
         let epinephrinePens = [
             {id: 'EPI-2024-045', expiration: '2024-01-20', location: 'Kitchen', quantity: 1},
@@ -1308,7 +1159,97 @@ function initChecklist() {
         // DOM elements - will be set after DOM loads
         let penForm, trainingForm, penTable, trainingTable;
         
-        // Initialize checklist
+        // Tab switching
+        function switchTab(clickedTab, tabName) {
+            // Hide all tab contents
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active from all tabs
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected content
+            const targetContent = document.getElementById(tabName);
+            if (targetContent) {
+                targetContent.classList.add('active');
+            }
+            
+            // Activate clicked tab
+            if (clickedTab) {
+                clickedTab.classList.add('active');
+            }
+        }
+        
+        // Auth functions
+        async function signInWithGoogle() {
+            const { error } = await supabase.auth.signInWithOAuth({
+                provider: 'google'
+            });
+            if (error) alert('Google sign-in error: ' + error.message);
+        }
+        
+        async function signOut() {
+            await supabase.auth.signOut();
+            location.reload();
+        }
+        
+        async function updateAuthUI() {
+            const { data: { user } } = await supabase.auth.getUser();
+            const signinBtn = document.getElementById('google-signin-btn');
+            const signoutBtn = document.getElementById('signout-btn');
+            const userEmail = document.getElementById('user-email');
+            
+            if (user) {
+                signinBtn.style.display = 'none';
+                signoutBtn.style.display = 'inline-block';
+                userEmail.textContent = user.email;
+            } else {
+                signinBtn.style.display = 'inline-block';
+                signoutBtn.style.display = 'none';
+                userEmail.textContent = '';
+            }
+        }
+        
+        // Auth state changes
+        supabase.auth.onAuthStateChange(async (event, session) => {
+            await updateAuthUI();
+            if (event === 'SIGNED_IN') {
+                await loadChecklistFromSupabase();
+                initChecklist();
+            }
+        });
+        
+        // Supabase checklist functions
+        async function saveChecklistToSupabase() {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) return;
+            
+            await supabase.from('compliance_checklists').upsert([
+                { user_id: user.id, checklist: checklistStatus }
+            ]);
+        }
+        
+        async function loadChecklistFromSupabase() {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) return;
+            
+            const { data, error } = await supabase
+                .from('compliance_checklists')
+                .select('checklist')
+                .eq('user_id', user.id)
+                .single();
+                
+            if (data && data.checklist) {
+                checklistStatus = data.checklist;
+            }
+        }
+        
+        // Initialize checklist with proper Supabase sync
         function initChecklist() {
             const checks = ['inventory', 'actionPlan', 'temperature', 'training'];
             
@@ -1323,7 +1264,7 @@ function initChecklist() {
                     }
                 }
                 
-                checkbox.addEventListener('change', function() {
+                checkbox.addEventListener('change', async function() {
                     if (this.checked) {
                         const now = new Date();
                         const dateStr = now.toISOString().split('T')[0];
@@ -1340,6 +1281,7 @@ function initChecklist() {
                         dateSpan.textContent = '';
                     }
                     saveData();
+                    await saveChecklistToSupabase(); // Save to Supabase after any change
                 });
             });
         }
@@ -1434,28 +1376,28 @@ function initChecklist() {
                 if (title.textContent.includes('Inventory Compliance')) {
                     const paragraphs = card.querySelectorAll('p');
                     if (paragraphs[0]) {
-                        const icon = totalPens >= 2 ? 'check-circle' : 'exclamation-circle';
+                        const icon = totalPens >= 2 ? 'circle-check' : 'circle-x';
                         const color = totalPens >= 2 ? '#27ae60' : '#e74c3c';
-                        paragraphs[0].innerHTML = `<i class="fas fa-${icon}" style="color: ${color};"></i> Minimum devices: <strong>${totalPens}</strong> (Required: 2)`;
+                        paragraphs[0].innerHTML = `<span class="icon icon-${icon}" style="color: ${color};"></span> Minimum devices: <strong>${totalPens}</strong> (Required: 2)`;
                     }
                     if (paragraphs[1]) {
-                        const icon = expiredPens === 0 ? 'check-circle' : 'exclamation-circle';
+                        const icon = expiredPens === 0 ? 'circle-check' : 'circle-x';
                         const color = expiredPens === 0 ? '#27ae60' : '#e74c3c';
-                        paragraphs[1].innerHTML = `<i class="fas fa-${icon}" style="color: ${color};"></i> Expired devices: <strong>${expiredPens}</strong>`;
+                        paragraphs[1].innerHTML = `<span class="icon icon-${icon}" style="color: ${color};"></span> Expired devices: <strong>${expiredPens}</strong>`;
                     }
                 }
                 
                 if (title.textContent.includes('Training Compliance')) {
                     const paragraphs = card.querySelectorAll('p');
                     if (paragraphs[0]) {
-                        const icon = totalStaff >= 1 ? 'check-circle' : 'exclamation-circle';
+                        const icon = totalStaff >= 1 ? 'circle-check' : 'circle-x';
                         const color = totalStaff >= 1 ? '#27ae60' : '#e74c3c';
-                        paragraphs[0].innerHTML = `<i class="fas fa-${icon}" style="color: ${color};"></i> Trained staff: <strong>${totalStaff}</strong> (Required: 1)`;
+                        paragraphs[0].innerHTML = `<span class="icon icon-${icon}" style="color: ${color};"></span> Trained staff: <strong>${totalStaff}</strong> (Required: 1)`;
                     }
                     if (paragraphs[1]) {
-                        const icon = expiringTrainings === 0 ? 'check-circle' : 'exclamation-triangle';
+                        const icon = expiringTrainings === 0 ? 'circle-check' : 'triangle';
                         const color = expiringTrainings === 0 ? '#27ae60' : '#f39c12';
-                        paragraphs[1].innerHTML = `<i class="fas fa-${icon}" style="color: ${color};"></i> Expiring soon: <strong>${expiringTrainings} certification${expiringTrainings !== 1 ? 's' : ''}</strong>`;
+                        paragraphs[1].innerHTML = `<span class="icon icon-${icon}" style="color: ${color};"></span> Expiring soon: <strong>${expiringTrainings} certification${expiringTrainings !== 1 ? 's' : ''}</strong>`;
                     }
                 }
             });
@@ -1528,7 +1470,7 @@ function initChecklist() {
                     <td><span class="status-badge ${statusBadgeClass}">${statusText}</span></td>
                     <td>
                         <button class="btn-danger" onclick="removePen('${pen.id}')">
-                            <i class="fas fa-trash-alt"></i>
+                            <span class="icon icon-trash"></span>
                         </button>
                     </td>
                 `;
@@ -1562,6 +1504,10 @@ function initChecklist() {
                     statusClass = 'expiring-soon';
                     statusText = 'EXPIRING';
                     statusBadgeClass = 'status-expiring';
+                } else if (days <= 60) {
+                    statusClass = 'expiring-soon';
+                    statusText = 'EXPIRING';
+                    statusBadgeClass = 'status-expiring';
                 }
                 
                 row.className = statusClass;
@@ -1573,7 +1519,7 @@ function initChecklist() {
                     <td><span class="status-badge ${statusBadgeClass}">${statusText}</span></td>
                     <td>
                         <button class="btn-danger" onclick="removeTrainedStaff(${staff.id})">
-                            <i class="fas fa-trash-alt"></i>
+                            <span class="icon icon-trash"></span>
                         </button>
                     </td>
                 `;
@@ -1581,43 +1527,34 @@ function initChecklist() {
             });
         }
         
-        // Initialize
-        function init() {
-            // Get DOM elements after page loads
-            penForm = document.getElementById('penForm');
-            trainingForm = document.getElementById('trainingForm');
-            penTable = document.getElementById('penTable').querySelector('tbody');
-            trainingTable = document.getElementById('trainingTable').querySelector('tbody');
+        // Initialize forms
+        function initForms() {
+            penForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const formData = new FormData(penForm);
+                const penData = {
+                    id: formData.get('penId'),
+                    expiration: formData.get('expiration'),
+                    location: formData.get('location'),
+                    quantity: parseInt(formData.get('quantity'))
+                };
+                addPen(penData);
+                penForm.reset();
+                showNotification('Epinephrine pen added successfully!', 'success');
+            });
             
-            initChecklist();
-            renderPenTable();
-            renderTrainingTable();
-            updateDashboard();
-            initForms();
-        }
-        
-        // Refresh compliance data
-        function refreshComplianceData() {
-            // Show a loading state
-            const button = event.target;
-            const originalText = button.innerHTML;
-            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Refreshing...';
-            button.disabled = true;
-            
-            // Simulate data refresh (in real app this would call an API)
-            setTimeout(() => {
-                // Re-render all tables and update dashboard
-                renderPenTable();
-                renderTrainingTable();
-                updateDashboard();
-                
-                // Reset button
-                button.innerHTML = originalText;
-                button.disabled = false;
-                
-                // Show success message
-                showNotification('Compliance data refreshed successfully!', 'success');
-            }, 1500);
+            trainingForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const formData = new FormData(trainingForm);
+                const staffData = {
+                    name: formData.get('name'),
+                    trainingDate: formData.get('trainingDate'),
+                    certificate: formData.get('certificate') || ''
+                };
+                addTrainedStaff(staffData);
+                trainingForm.reset();
+                showNotification('Trained staff member added successfully!', 'success');
+            });
         }
         
         // Show notification
@@ -1631,9 +1568,9 @@ function initChecklist() {
             notification.style.minWidth = '300px';
             notification.style.animation = 'slideIn 0.3s ease';
             
-            const icon = type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle';
+            const icon = type === 'success' ? 'circle-check' : type === 'warning' ? 'triangle' : 'info';
             notification.innerHTML = `
-                <i class="fas fa-${icon}"></i>
+                <span class="icon icon-${icon}"></span>
                 <span>${message}</span>
             `;
             
@@ -1665,34 +1602,64 @@ function initChecklist() {
             showNotification('Expiration alerts configured successfully!', 'success');
         }
         
-        // Initialize form event handlers
-        function initForms() {
-            penForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const formData = new FormData(penForm);
-                const penData = {
-                    id: formData.get('penId'),
-                    expiration: formData.get('expiration'),
-                    location: formData.get('location'),
-                    quantity: parseInt(formData.get('quantity'))
-                };
-                addPen(penData);
-                penForm.reset();
-                showNotification('Epinephrine pen added successfully!', 'success');
-            });
+        // Refresh compliance data
+        function refreshComplianceData() {
+            // Show a loading state
+            const button = event.target;
+            const originalText = button.innerHTML;
+            button.innerHTML = '<span class="icon icon-spinner"></span> Refreshing...';
+            button.disabled = true;
             
-            trainingForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const formData = new FormData(trainingForm);
-                const staffData = {
-                    name: formData.get('name'),
-                    trainingDate: formData.get('trainingDate'),
-                    certificate: formData.get('certificate') || ''
-                };
-                addTrainedStaff(staffData);
-                trainingForm.reset();
-                showNotification('Trained staff member added successfully!', 'success');
-            });
+            // Simulate data refresh (in real app this would call an API)
+            setTimeout(() => {
+                // Re-render all tables and update dashboard
+                renderPenTable();
+                renderTrainingTable();
+                updateDashboard();
+                
+                // Reset button
+                button.innerHTML = originalText;
+                button.disabled = false;
+                
+                // Show success message
+                showNotification('Compliance data refreshed successfully!', 'success');
+            }, 1500);
+        }
+        
+        // Main initialization
+        async function init() {
+            // Get DOM elements
+            penForm = document.getElementById('penForm');
+            trainingForm = document.getElementById('trainingForm');
+            penTable = document.getElementById('penTable').querySelector('tbody');
+            trainingTable = document.getElementById('trainingTable').querySelector('tbody');
+            
+            // Update auth UI
+            await updateAuthUI();
+            
+            // Load data for logged-in user
+            await loadChecklistFromSupabase();
+            
+            // Initialize UI components
+            initChecklist();
+            renderPenTable();
+            renderTrainingTable();
+            updateDashboard();
+            initForms();
+            
+            // Add some CSS for animations
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideIn {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+                @keyframes slideOut {
+                    from { transform: translateX(0); opacity: 1; }
+                    to { transform: translateX(100%); opacity: 0; }
+                }
+            `;
+            document.head.appendChild(style);
         }
         
         // Run initialization when page loads
