@@ -1639,7 +1639,7 @@
        async function init() {
     // Handle Supabase OAuth callback for static sites
     if (window.location.hash && window.location.hash.includes('access_token')) {
-        const { data, error } = await supabase.auth.getSessionFromUrl({ storeSession: true });
+        const { data, error } = await supabase.auth.exchangeCodeForSession();
         if (error) {
             console.error("OAuth error:", error);
         } else {
