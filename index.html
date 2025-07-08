@@ -1242,20 +1242,22 @@
             ]);
         }
         
-        async function loadChecklistFromSupabase() {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) return;
-            
-            const { data, error } = await supabase
-                .from('compliance_checklists')
-                .select('checklist')
-                .eq('user_id', user.id)
-                .single();
-                
-            if (data && data.checklist) {
-                checklistStatus = data.checklist;
-            }
-        }
+       async function loadChecklistFromSupabase() {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const { data, error } = await supabase
+        .from('compliance_checklists')
+        .select('checklist')
+        .eq('user_id', user.id)
+        .maybeSingle(); // this avoids 406 if no row exists
+    if (error) {
+        console.error('Error loading checklist:', error);
+        return;
+    }
+    if (data && data.checklist) {
+        checklistStatus = data.checklist;
+    }
+}
         
         // Initialize checklist with proper Supabase sync
         function initChecklist() {
