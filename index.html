@@ -1636,41 +1636,52 @@
             }, 1500);
         }
         
-        // Main initialization
-        async function init() {
-            // Get DOM elements
-            penForm = document.getElementById('penForm');
-            trainingForm = document.getElementById('trainingForm');
-            penTable = document.getElementById('penTable').querySelector('tbody');
-            trainingTable = document.getElementById('trainingTable').querySelector('tbody');
-            
-            // Update auth UI
-            await updateAuthUI();
-            
-            // Load data for logged-in user
-            await loadChecklistFromSupabase();
-            
-            // Initialize UI components
-            initChecklist();
-            renderPenTable();
-            renderTrainingTable();
-            updateDashboard();
-            initForms();
-            
-            // Add some CSS for animations
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes slideIn {
-                    from { transform: translateX(100%); opacity: 0; }
-                    to { transform: translateX(0); opacity: 1; }
-                }
-                @keyframes slideOut {
-                    from { transform: translateX(0); opacity: 1; }
-                    to { transform: translateX(100%); opacity: 0; }
-                }
-            `;
-            document.head.appendChild(style);
+       async function init() {
+    // Handle Supabase OAuth callback for static sites
+    if (window.location.hash && window.location.hash.includes('access_token')) {
+        const { data, error } = await supabase.auth.getSessionFromUrl({ storeSession: true });
+        if (error) {
+            console.error("OAuth error:", error);
+        } else {
+            console.log("OAuth session finalized via getSessionFromUrl");
         }
+        // Optionally clean up the URL hash for a better UX
+        window.location.hash = '';
+    }
+
+    // Get DOM elements
+    penForm = document.getElementById('penForm');
+    trainingForm = document.getElementById('trainingForm');
+    penTable = document.getElementById('penTable').querySelector('tbody');
+    trainingTable = document.getElementById('trainingTable').querySelector('tbody');
+
+    // Update auth UI
+    await updateAuthUI();
+
+    // Load data for logged-in user
+    await loadChecklistFromSupabase();
+
+    // Initialize UI components
+    initChecklist();
+    renderPenTable();
+    renderTrainingTable();
+    updateDashboard();
+    initForms();
+
+    // Add some CSS for animations
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+    `;
+    document.head.appendChild(style);
+}
         
         // Run initialization when page loads
         document.addEventListener('DOMContentLoaded', init);
