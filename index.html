@@ -1194,9 +1194,11 @@
         }
         
         async function signOut() {
-            await supabase.auth.signOut();
-            location.reload();
-        }
+    await supabase.auth.signOut();
+    await updateAuthUI();
+    // Optional: switch to the welcome tab for logged-out users
+    switchTab(document.querySelector('.tab[onclick*="welcome"]'), 'welcome');
+}
         
         async function updateAuthUI() {
             const { data: { user } } = await supabase.auth.getUser();
